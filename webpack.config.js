@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: './src/main.ts',
   output: {
     filename: 'worker.js',
     path: path.join(__dirname, 'dist'),
@@ -16,10 +16,6 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
-        options: {
-          // transpileOnly is useful to skip typescript checks occasionally:
-          // transpileOnly: true,
-        },
       },
     ],
   },

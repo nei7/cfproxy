@@ -1,59 +1,29 @@
-import { Upstream } from '../types/upstream'
+import { Context, Route } from '../types'
+import { buildResponse } from '../utils'
 
-type Handler = (request: Request) => Promise<Response>
+export const useUpstream = async (
+  context: Context,
+  route: Route,
+): Promise<void> => {
+  const { pathname, search } = context.url
+  const endpoint = pathname.replace(route.upstream.path, '')
 
-export const useUpstreams = (upstreams: Upstream[]): Handler => {
-  const handler = async (request: Request) => {
-    for (const upstream of upstreams) {
-      const route = matchRoute(upstream, request)
-      if (!route) {
-        return new Response('no response')
-      }
+  const requestUrl = `${route.upstream.protocol}://${route.upstream.domain}/${endpoint}${search}`
 
-      return execute(request, upstream)
-    }
-
-    return new Response('')
-  }
-
-  return handler
-}
-
-const matchRoute = (upstream: Upstream, request: Request): Upstream | void => {
-  const url = new URL(request.url)
-  if (upstream.path.test(url.pathname)) {
-    return upstream
-  }
-  return undefined
-}
-
-const execute = async (
-  { method, headers, body, url }: Request,
-  upstream: Upstream,
-): Promise<Response> => {
-  const controller = new AbortController()
-  const { pathname, search } = new URL(url)
-
-  const endpoint = pathname.replace(upstream.path, '')
-
-  const requestUrl = `${upstream.protocol}://${upstream.domain}/${endpoint}${search}`
-  console.log(requestUrl)
   try {
+    const controller = new AbortController()
     const request = new Request(requestUrl, {
-      method,
-      headers,
-      body,
+      method: context.request.method,
+      headers: route.headers.request,
       signal: controller.signal,
     })
 
-    setTimeout(() => controller.abort(), upstream.timeout || 30000)
+    setTimeout(() => controller.abort(), route.upstream.timeout || 30000)
 
     const response = await fetch(request)
 
-    return response
+    context.response = response
   } catch (err) {
-    return new Response(JSON.stringify(err), {
-      status: 500,
-    })
+    context.response = buildResponse((err as Error).message, 500)
   }
 }
