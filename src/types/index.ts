@@ -18,8 +18,20 @@ export interface Route {
 }
 
 export interface Context {
-  request: Request
   url: URL
-
+  request: Request
   response: Response
+
+  logger: Logger
 }
+
+export interface SentryLoggerOptions {
+  sentryProjectId: string
+  sentryKey: string
+  clientName: string
+  clientVersion: string
+
+  enviroment: string
+}
+
+export type Logger = { error: (err: Error, request: Request) => Promise<void> }

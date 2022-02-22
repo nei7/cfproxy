@@ -5,10 +5,9 @@ export const useUpstream = async (
   context: Context,
   route: Route,
 ): Promise<void> => {
-  const { pathname, search } = context.url
-  const endpoint = pathname.replace(route.upstream.path, '')
+  const { search } = context.url
 
-  const requestUrl = `${route.upstream.protocol}://${route.upstream.domain}/${endpoint}${search}`
+  const requestUrl = `${route.upstream.protocol}://${route.upstream.domain}/${route.upstream.path}${search}`
 
   try {
     const controller = new AbortController()
@@ -24,6 +23,8 @@ export const useUpstream = async (
 
     context.response = response
   } catch (err) {
+    context.logger.error(err as Error, context.request)
+
     context.response = buildResponse((err as Error).message, 500)
   }
 }

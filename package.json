@@ -8,7 +8,7 @@
     "format": "prettier --write  '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "lint": "eslint --max-warnings=0 src && prettier --check '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "test": "jest --config jestconfig.json --verbose",
-    "dev": "concurrently \"webpack --watch\" \"miniflare dist/worker.js --watch --debug\""
+    "dev": "concurrently --kill-others \"miniflare dist/worker.js --watch\" \"webpack --watch\""
   },
   "author": "nei7",
   "eslintConfig": {
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.0.0",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
     "concurrently": "^7.0.0",
@@ -33,5 +34,8 @@
     "typescript": "^4.3.2",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.0"
+  },
+  "dependencies": {
+    "uuid": "^8.3.2"
   }
 }
